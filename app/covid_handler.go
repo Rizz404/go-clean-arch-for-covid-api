@@ -63,7 +63,7 @@ func (apiCfg *apiConfig) createCovidHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusCreated, covid)
+	utils.RespondWithJSON(w, http.StatusCreated, dbCovidToCovid(covid))
 }
 
 func (apiCfg *apiConfig) getCovidsHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +77,7 @@ func (apiCfg *apiConfig) getCovidsHandler(w http.ResponseWriter, r *http.Request
 		covids = []sqlc.Covid{}
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, covids)
+	utils.RespondWithJSON(w, http.StatusOK, dbCovidsToCovids(covids))
 }
 
 func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +98,7 @@ func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, covid)
+	utils.RespondWithJSON(w, http.StatusOK, dbCovidToCovid(covid))
 }
 
 func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Request) {
@@ -160,7 +160,7 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, covid)
+	utils.RespondWithJSON(w, http.StatusOK, dbCovidToCovid(covid))
 }
 
 func (apiCfg *apiConfig) deleteCovidHandler(w http.ResponseWriter, r *http.Request) {
