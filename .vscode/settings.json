@@ -1,0 +1,10 @@
+{
+  "Prettier-SQL.SQLFlavourOverride": "sqlite",
+  "Prettier-SQL.keywordCase": "preserve",
+  "Prettier-SQL.indentStyle": "standard",
+  "Prettier-SQL.expressionWidth": 80,
+  "Prettier-SQL.commaPosition": "after",
+  "Prettier-SQL.linesBetweenQueries": 1,
+  "Prettier-SQL.denseOperators": false,
+  "Prettier-SQL.newlineBeforeSemicolon": false
+}
