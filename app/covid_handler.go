@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type covidRequestPayload struct {
+type createRequestPayload struct {
 	Nama      string `json:"nama" form:"nama"`
 	Kota      string `json:"kota" form:"kota"`
 	Sembuh    int64  `json:"sembuh" form:"sembuh"`
@@ -20,8 +20,17 @@ type covidRequestPayload struct {
 	Total     int64  `json:"total" form:"total"`
 }
 
+type updateRequestPayload struct {
+	Nama      *string `json:"nama" form:"nama"`
+	Kota      *string `json:"kota" form:"kota"`
+	Sembuh    *int64  `json:"sembuh" form:"sembuh"`
+	Dirawat   *int64  `json:"dirawat" form:"dirawat"`
+	Meninggal *int64  `json:"meninggal" form:"meninggal"`
+	Total     *int64  `json:"total" form:"total"`
+}
+
 func (apiCfg *apiConfig) createCovidHandler(w http.ResponseWriter, r *http.Request) {
-	var req covidRequestPayload
+	var req createRequestPayload
 	if err := utils.ParseRequestBody(r, &req); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Gagal parse request: %v", err))
 		return
@@ -103,7 +112,7 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var req covidRequestPayload
+	var req updateRequestPayload
 	if err := utils.ParseRequestBody(r, &req); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Gagal parse request: %v", err))
 		return
@@ -111,32 +120,31 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 
 	updatedData := sqlc.UpdateCovidParams{
 		ID:        id,
-		Nama:      req.Nama,
-		Kota:      req.Kota,
-		Sembuh:    req.Sembuh,
-		Dirawat:   req.Dirawat,
-		Meninggal: req.Meninggal,
-		Total:     req.Total,
+		Nama:      existingCovid.Nama,
+		Kota:      existingCovid.Kota,
+		Sembuh:    existingCovid.Sembuh,
+		Dirawat:   existingCovid.Dirawat,
+		Meninggal: existingCovid.Meninggal,
+		Total:     existingCovid.Total,
 	}
 
-	// * Jika field kosong gunakan nilai lama
-	if req.Nama == "" {
-		updatedData.Nama = existingCovid.Nama
+	if req.Nama != nil {
+		updatedData.Nama = *req.Nama
 	}
-	if req.Kota == "" {
-		updatedData.Kota = existingCovid.Kota
+	if req.Kota != nil {
+		updatedData.Kota = *req.Kota
 	}
-	if req.Sembuh == 0 {
-		updatedData.Sembuh = existingCovid.Sembuh
+	if req.Sembuh != nil {
+		updatedData.Sembuh = *req.Sembuh
 	}
-	if req.Dirawat == 0 {
-		updatedData.Dirawat = existingCovid.Dirawat
+	if req.Dirawat != nil {
+		updatedData.Dirawat = *req.Dirawat
 	}
-	if req.Meninggal == 0 {
-		updatedData.Meninggal = existingCovid.Meninggal
+	if req.Meninggal != nil {
+		updatedData.Meninggal = *req.Meninggal
 	}
-	if req.Total == 0 {
-		updatedData.Total = existingCovid.Total
+	if req.Total != nil {
+		updatedData.Total = *req.Total
 	}
 
 	covid, err := apiCfg.DB.UpdateCovid(r.Context(), updatedData)

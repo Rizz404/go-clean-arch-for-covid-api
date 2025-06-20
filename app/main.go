@@ -59,6 +59,7 @@ func main() {
 	v1Router.Post("/covids", apiCfg.createCovidHandler)
 	v1Router.Get("/covids", apiCfg.getCovidsHandler)
 	v1Router.Get("/covids/{id}", apiCfg.getCovidByIdHandler)
+	// ! masih gak work urlencoded buat patch
 	v1Router.Patch("/covids/{id}", apiCfg.updateCovidHandler)
 	v1Router.Delete("/covids/{id}", apiCfg.deleteCovidHandler)
 
