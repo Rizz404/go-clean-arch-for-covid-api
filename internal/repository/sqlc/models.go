@@ -4,12 +4,16 @@
 
 package sqlc
 
+import (
+	"github.com/google/uuid"
+)
+
 type Covid struct {
-	ID        int64  `json:"id"`
-	Nama      string `json:"nama"`
-	Kota      string `json:"kota"`
-	Sembuh    int64  `json:"sembuh"`
-	Dirawat   int64  `json:"dirawat"`
-	Meninggal int64  `json:"meninggal"`
-	Total     int64  `json:"total"`
+	ID        uuid.UUID `json:"id"`
+	Nama      string    `json:"nama"`
+	Kota      string    `json:"kota"`
+	Sembuh    int32     `json:"sembuh"`
+	Dirawat   int32     `json:"dirawat"`
+	Meninggal int32     `json:"meninggal"`
+	Total     int32     `json:"total"`
 }

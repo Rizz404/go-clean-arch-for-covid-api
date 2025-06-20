@@ -1,13 +1,13 @@
 -- +goose Up
 CREATE TABLE
   covids (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nama TEXT NOT NULL,
-    kota TEXT NOT NULL,
-    sembuh INTEGER NOT NULL DEFAULT 0,
-    dirawat INTEGER NOT NULL DEFAULT 0,
-    meninggal INTEGER NOT NULL DEFAULT 0,
-    total INTEGER NOT NULL DEFAULT 0
+    id UUID PRIMARY KEY,
+    nama STRING NOT NULL,
+    kota STRING NOT NULL,
+    sembuh INT NOT NULL DEFAULT 0,
+    dirawat INT NOT NULL DEFAULT 0,
+    meninggal INT NOT NULL DEFAULT 0,
+    total INT NOT NULL DEFAULT 0
   );
 
 -- +goose Down

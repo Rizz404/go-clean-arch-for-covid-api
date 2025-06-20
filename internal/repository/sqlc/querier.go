@@ -6,12 +6,14 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CreateCovid(ctx context.Context, arg CreateCovidParams) (Covid, error)
-	DeleteCovid(ctx context.Context, id int64) error
-	GetCovid(ctx context.Context, id int64) (Covid, error)
+	DeleteCovid(ctx context.Context, id uuid.UUID) error
+	GetCovid(ctx context.Context, id uuid.UUID) (Covid, error)
 	GetCovids(ctx context.Context) ([]Covid, error)
 	UpdateCovid(ctx context.Context, arg UpdateCovidParams) (Covid, error)
 }

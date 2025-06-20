@@ -1,3 +1,5 @@
+// File: app/main.go
+
 package main
 
 import (
@@ -11,8 +13,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 
-	// Import driver untuk sqlite
-	_ "modernc.org/sqlite"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
@@ -27,25 +28,22 @@ func main() {
 		log.Fatal("ADDR is not found in env")
 	}
 
-	dbPath := os.Getenv("GOOSE_DBSTRING")
-	if dbPath == "" {
-		log.Fatal("GOOSE_DBSTRING is not found in env")
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL is not found in env")
 	}
-	log.Println("Attempting to connect to database at path:", dbPath)
+	log.Println("Attempting to connect to CockroachDB...")
 
-	// * Buka koneksi ke SQLite menggunakan driver "sqlite"
-	conn, err := sql.Open("sqlite", dbPath)
+	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal("Can't connect to database: ", err)
 	}
 
-	// * Buat instance dari sqlc Queries
 	db := sqlc.New(conn)
 	apiCfg := apiConfig{DB: db}
 
 	router := chi.NewRouter()
 
-	// * Middleware
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://*", "https://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},

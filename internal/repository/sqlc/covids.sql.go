@@ -7,26 +7,32 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createCovid = `-- name: CreateCovid :one
 INSERT INTO
-  covids (nama, kota, sembuh, dirawat, meninggal, total)
+  covids (id, nama, kota, sembuh, dirawat, meninggal, total)
 VALUES
-  (?, ?, ?, ?, ?, ?) RETURNING id, nama, kota, sembuh, dirawat, meninggal, total
+  ($1, $2, $3, $4, $5, $6, $7)
+RETURNING
+  id, nama, kota, sembuh, dirawat, meninggal, total
 `
 
 type CreateCovidParams struct {
-	Nama      string `json:"nama"`
-	Kota      string `json:"kota"`
-	Sembuh    int64  `json:"sembuh"`
-	Dirawat   int64  `json:"dirawat"`
-	Meninggal int64  `json:"meninggal"`
-	Total     int64  `json:"total"`
+	ID        uuid.UUID `json:"id"`
+	Nama      string    `json:"nama"`
+	Kota      string    `json:"kota"`
+	Sembuh    int32     `json:"sembuh"`
+	Dirawat   int32     `json:"dirawat"`
+	Meninggal int32     `json:"meninggal"`
+	Total     int32     `json:"total"`
 }
 
 func (q *Queries) CreateCovid(ctx context.Context, arg CreateCovidParams) (Covid, error) {
 	row := q.db.QueryRowContext(ctx, createCovid,
+		arg.ID,
 		arg.Nama,
 		arg.Kota,
 		arg.Sembuh,
@@ -50,10 +56,10 @@ func (q *Queries) CreateCovid(ctx context.Context, arg CreateCovidParams) (Covid
 const deleteCovid = `-- name: DeleteCovid :exec
 DELETE FROM covids
 WHERE
-  id = ?
+  id = $1
 `
 
-func (q *Queries) DeleteCovid(ctx context.Context, id int64) error {
+func (q *Queries) DeleteCovid(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteCovid, id)
 	return err
 }
@@ -64,12 +70,12 @@ SELECT
 FROM
   covids
 WHERE
-  id = ?
+  id = $1
 LIMIT
   1
 `
 
-func (q *Queries) GetCovid(ctx context.Context, id int64) (Covid, error) {
+func (q *Queries) GetCovid(ctx context.Context, id uuid.UUID) (Covid, error) {
 	row := q.db.QueryRowContext(ctx, getCovid, id)
 	var i Covid
 	err := row.Scan(
@@ -127,24 +133,26 @@ func (q *Queries) GetCovids(ctx context.Context) ([]Covid, error) {
 const updateCovid = `-- name: UpdateCovid :one
 UPDATE covids
 SET
-  nama = ?,
-  kota = ?,
-  sembuh = ?,
-  dirawat = ?,
-  meninggal = ?,
-  total = ?
+  nama = $1,
+  kota = $2,
+  sembuh = $3,
+  dirawat = $4,
+  meninggal = $5,
+  total = $6
 WHERE
-  id = ? RETURNING id, nama, kota, sembuh, dirawat, meninggal, total
+  id = $7
+RETURNING
+  id, nama, kota, sembuh, dirawat, meninggal, total
 `
 
 type UpdateCovidParams struct {
-	Nama      string `json:"nama"`
-	Kota      string `json:"kota"`
-	Sembuh    int64  `json:"sembuh"`
-	Dirawat   int64  `json:"dirawat"`
-	Meninggal int64  `json:"meninggal"`
-	Total     int64  `json:"total"`
-	ID        int64  `json:"id"`
+	Nama      string    `json:"nama"`
+	Kota      string    `json:"kota"`
+	Sembuh    int32     `json:"sembuh"`
+	Dirawat   int32     `json:"dirawat"`
+	Meninggal int32     `json:"meninggal"`
+	Total     int32     `json:"total"`
+	ID        uuid.UUID `json:"id"`
 }
 
 func (q *Queries) UpdateCovid(ctx context.Context, arg UpdateCovidParams) (Covid, error) {

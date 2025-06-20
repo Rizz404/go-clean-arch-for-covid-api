@@ -3,30 +3,34 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
 	"net/http"
-	"strconv"
+	"time"
 
 	"github.com/Rizz404/go-clean-arch-for-covid-api/internal/repository/sqlc"
 	"github.com/Rizz404/go-clean-arch-for-covid-api/utils"
 	"github.com/go-chi/chi/v5"
+
+	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 )
 
 type createRequestPayload struct {
 	Nama      string `json:"nama" form:"nama"`
 	Kota      string `json:"kota" form:"kota"`
-	Sembuh    int64  `json:"sembuh" form:"sembuh"`
-	Dirawat   int64  `json:"dirawat" form:"dirawat"`
-	Meninggal int64  `json:"meninggal" form:"meninggal"`
-	Total     int64  `json:"total" form:"total"`
+	Sembuh    int32  `json:"sembuh" form:"sembuh"`
+	Dirawat   int32  `json:"dirawat" form:"dirawat"`
+	Meninggal int32  `json:"meninggal" form:"meninggal"`
+	Total     int32  `json:"total" form:"total"`
 }
 
 type updateRequestPayload struct {
 	Nama      *string `json:"nama" form:"nama"`
 	Kota      *string `json:"kota" form:"kota"`
-	Sembuh    *int64  `json:"sembuh" form:"sembuh"`
-	Dirawat   *int64  `json:"dirawat" form:"dirawat"`
-	Meninggal *int64  `json:"meninggal" form:"meninggal"`
-	Total     *int64  `json:"total" form:"total"`
+	Sembuh    *int32  `json:"sembuh" form:"sembuh"`
+	Dirawat   *int32  `json:"dirawat" form:"dirawat"`
+	Meninggal *int32  `json:"meninggal" form:"meninggal"`
+	Total     *int32  `json:"total" form:"total"`
 }
 
 func (apiCfg *apiConfig) createCovidHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +45,11 @@ func (apiCfg *apiConfig) createCovidHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	entropy := ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0)
+	newID := ulid.MustNew(ulid.Timestamp(time.Now()), entropy)
+
 	covid, err := apiCfg.DB.CreateCovid(r.Context(), sqlc.CreateCovidParams{
+		ID:        uuid.UUID(newID),
 		Nama:      req.Nama,
 		Kota:      req.Kota,
 		Sembuh:    req.Sembuh,
@@ -65,7 +73,6 @@ func (apiCfg *apiConfig) getCovidsHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// * Inisialisasi ke empty slice
 	if covids == nil {
 		covids = []sqlc.Covid{}
 	}
@@ -75,9 +82,9 @@ func (apiCfg *apiConfig) getCovidsHandler(w http.ResponseWriter, r *http.Request
 
 func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := uuid.Parse(idStr)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "ID tidak valid")
+		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 
@@ -96,9 +103,9 @@ func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Requ
 
 func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := uuid.Parse(idStr)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "ID tidak valid")
+		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 
@@ -158,9 +165,9 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 
 func (apiCfg *apiConfig) deleteCovidHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := uuid.Parse(idStr)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "ID tidak valid")
+		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 

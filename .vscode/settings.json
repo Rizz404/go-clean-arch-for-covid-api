@@ -1,5 +1,5 @@
 {
-  "Prettier-SQL.SQLFlavourOverride": "sqlite",
+  "Prettier-SQL.SQLFlavourOverride": "postgresql",
   "Prettier-SQL.keywordCase": "preserve",
   "Prettier-SQL.indentStyle": "standard",
   "Prettier-SQL.expressionWidth": 80,
