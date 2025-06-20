@@ -31,6 +31,7 @@ func main() {
 	if dbPath == "" {
 		log.Fatal("GOOSE_DBSTRING is not found in env")
 	}
+	log.Println("Attempting to connect to database at path:", dbPath)
 
 	// * Buka koneksi ke SQLite menggunakan driver "sqlite"
 	conn, err := sql.Open("sqlite", dbPath)
