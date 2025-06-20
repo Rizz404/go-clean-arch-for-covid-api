@@ -10,8 +10,8 @@ import (
 	"github.com/Rizz404/go-clean-arch-for-covid-api/internal/repository/sqlc"
 	"github.com/Rizz404/go-clean-arch-for-covid-api/utils"
 	"github.com/go-chi/chi/v5"
-
 	"github.com/google/uuid"
+
 	"github.com/oklog/ulid/v2"
 )
 
@@ -82,13 +82,14 @@ func (apiCfg *apiConfig) getCovidsHandler(w http.ResponseWriter, r *http.Request
 
 func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	idULID, err := ulid.Parse(idStr)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 
-	covid, err := apiCfg.DB.GetCovid(r.Context(), id)
+	idUUID := uuid.UUID(idULID)
+	covid, err := apiCfg.DB.GetCovid(r.Context(), idUUID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.RespondWithError(w, http.StatusNotFound, "Data covid tidak ditemukan")
@@ -103,13 +104,14 @@ func (apiCfg *apiConfig) getCovidByIdHandler(w http.ResponseWriter, r *http.Requ
 
 func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	idULID, err := ulid.Parse(idStr)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 
-	existingCovid, err := apiCfg.DB.GetCovid(r.Context(), id)
+	idUUID := uuid.UUID(idULID)
+	existingCovid, err := apiCfg.DB.GetCovid(r.Context(), idUUID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.RespondWithError(w, http.StatusNotFound, "Data covid tidak ditemukan")
@@ -126,7 +128,7 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	updatedData := sqlc.UpdateCovidParams{
-		ID:        id,
+		ID:        idUUID,
 		Nama:      existingCovid.Nama,
 		Kota:      existingCovid.Kota,
 		Sembuh:    existingCovid.Sembuh,
@@ -165,13 +167,14 @@ func (apiCfg *apiConfig) updateCovidHandler(w http.ResponseWriter, r *http.Reque
 
 func (apiCfg *apiConfig) deleteCovidHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	idULID, err := ulid.Parse(idStr)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Format ID tidak valid")
 		return
 	}
 
-	err = apiCfg.DB.DeleteCovid(r.Context(), id)
+	idUUID := uuid.UUID(idULID)
+	err = apiCfg.DB.DeleteCovid(r.Context(), idUUID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Gagal menghapus data covid: %v", err))
 		return
